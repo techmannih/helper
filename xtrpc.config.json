@@ -1,0 +1,7 @@
+{
+  "srcProject": "./apps/nextjs",
+  "dstProject": "./apps/expo",
+  "outDir": "src/types",
+  "outName": "api.ts",
+  "overwrite": true
+}

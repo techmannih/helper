@@ -1,0 +1,48 @@
+{
+  "1": {
+    "36": {
+      "messages": [
+        {
+          "id": 184,
+          "role": "user",
+          "body": "Hi, I purchased your design toolkit a few months ago but recently had to reinstall my system. I still have my license key but can't find the download link or installation files. The purchase was around $89. Could you help me recover my purchase?",
+          "emailTo": null,
+          "emailFrom": "emma.designer@example.com",
+          "emailCc": [],
+          "emailBcc": null,
+          "metadata": {
+            "name": "Emma Chen",
+            "value": 99,
+            "links": {
+              "User profile": "https://example.com",
+              "Stripe customer": "https://stripe.com"
+            }
+          },
+          "status": null,
+          "conversationId": 36
+        },
+        {
+          "id": 185,
+          "role": "workflow",
+          "body": "Hi there,<br>\n            <br>\n            Thanks for reaching out! Here are some quick links that might help:<br>\n            <br>\n            <strong>Download Your Purchase:</strong><br>\n            1. Visit our <a href=\"https://designtools.example.com/account/downloads\">Downloads Page</a><br>\n            2. Log in with your email<br>\n            3. Find your purchase in the library<br>\n            <br>\n            <strong>License Recovery:</strong><br>\n            - Use our <a href=\"https://designtools.example.com/license-lookup\">License Lookup Tool</a><br>\n            - Enter your email or license key<br>\n            <br>\n            <strong>Installation Help:</strong><br>\n            - Check our <a href=\"https://designtools.example.com/docs/installation\">Installation Guide</a><br>\n            - View <a href=\"https://designtools.example.com/docs/system-requirements\">System Requirements</a><br>\n            <br>\n            If you need further assistance, please provide:<br>\n            - Your license key<br>\n            - Operating system version<br>\n            - Any error messages you're seeing<br>\n            <br>\n            We're here to help!\n        ",
+          "emailTo": null,
+          "emailFrom": null,
+          "emailCc": null,
+          "emailBcc": null,
+          "metadata": null,
+          "status": "sent",
+          "conversationId": 36
+        }
+      ],
+      "conversation": {
+        "source": "chat",
+        "subject": "License Recovery - Pro Design Toolkit 2024",
+        "emailFrom": "emma.designer@example.com",
+        "status": "open",
+        "emailFromName": "Emma Chen",
+
+        "isClosed": false
+      }
+    }
+  }
+}

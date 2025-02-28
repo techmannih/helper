@@ -1,0 +1,14 @@
+venv
+.env
+.DS_Store
+node_modules/
+docker/tmp/
+tmp/
+dist/
+.cache
+.turbo
+coverage/
+.vercel
+.tool-versions
+.shortest/
+docker/local-nginx/certs/*

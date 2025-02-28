@@ -1,0 +1,59 @@
+name: autofix.ci
+
+on:
+  pull_request:
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  TURBO_REMOTE_ONLY: true
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
+jobs:
+  autofix:
+    runs-on: ubicloud-standard-4
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Lint
+        run: bin/lint --fix
+        shell: bash
+
+      - name: Format
+        run: bin/format --write
+        shell: bash
+
+      - name: Typecheck
+        shell: bash
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+        run: |
+          set -eo pipefail
+          export NODE_OPTIONS="--max_old_space_size=4096"
+
+          # Pull environment variables from Vercel
+          cd apps/nextjs
+          vercel link --project helper --token=$VERCEL_TOKEN --scope anti-work --yes
+          vercel env pull --environment=development --token=$VERCEL_TOKEN --scope anti-work
+          test -f .env.local || (echo ".env.local not created" && exit 1)
+          cd ../..
+
+          # Run typecheck
+          npm run typecheck
+
+      - uses: autofix-ci/action@ff86a557419858bb967097bfc916833f5647fa8c
