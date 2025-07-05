@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ConversationListItem as ConversationItem } from "@/app/types/global";
 import { ConfirmationDialog } from "@/components/confirmationDialog";
-import LoadingSpinner from "@/components/loadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tooltip, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -20,6 +19,7 @@ import { useConversationsListInput } from "../shared/queries";
 import { ConversationFilters, useConversationFilters } from "./conversationFilters";
 import { useConversationListContext } from "./conversationListContext";
 import { ConversationListItem } from "./conversationListItem";
+import { ConversationListSkeleton } from "./conversationListSkeleton";
 import { ConversationSearchBar } from "./conversationSearchBar";
 import { NoConversations } from "./emptyState";
 import NewConversationModalContent from "./newConversationModal";
@@ -29,8 +29,15 @@ type ListItem = ConversationItem & { isNew?: boolean };
 export const List = () => {
   const [conversationSlug] = useQueryState("id");
   const { searchParams, input } = useConversationsListInput();
-  const { conversationListData, navigateToConversation, isPending, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useConversationListContext();
+  const {
+    conversationListData,
+    navigateToConversation,
+    isPending,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useConversationListContext();
 
   const [showFilters, setShowFilters] = useState(false);
   const { filterValues, activeFilterCount, updateFilter, clearFilters } = useConversationFilters();
@@ -286,9 +293,9 @@ export const List = () => {
           )}
         </div>
       </div>
-      {isPending ? (
-        <div className="flex-1 flex items-center justify-center">
-          <LoadingSpinner size="lg" />
+      {isPending || (isFetching && conversations.length === 0) ? (
+        <div className="flex-1 px-4">
+          <ConversationListSkeleton count={8} />
         </div>
       ) : conversations.length === 0 ? (
         <NoConversations filtered={activeFilterCount > 0 || !!input.search} />
@@ -307,7 +314,7 @@ export const List = () => {
           <div ref={loadMoreRef} />
           {isFetchingNextPage && (
             <div className="flex justify-center py-4">
-              <LoadingSpinner size="md" />
+              <ConversationListSkeleton count={3} />
             </div>
           )}
         </div>
