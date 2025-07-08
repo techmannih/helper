@@ -8,7 +8,7 @@ export function OPTIONS() {
   return corsOptions();
 }
 
-export const POST = withWidgetAuth(async ({ request }, { session: { email }, mailbox }) => {
+export const POST = withWidgetAuth(async ({ request }, { session: { email } }) => {
   const { sessionId } = await request.json();
 
   if (!sessionId || typeof sessionId !== "string") {
@@ -22,7 +22,7 @@ export const POST = withWidgetAuth(async ({ request }, { session: { email }, mai
       return corsResponse({ error: "Guide session not found" }, { status: 404 });
     }
 
-    if (guideSession.mailboxId !== mailbox.id || email !== guideSession.platformCustomer.email) {
+    if (email !== guideSession.platformCustomer.email) {
       return corsResponse({ error: "Unauthorized" }, { status: 403 });
     }
 

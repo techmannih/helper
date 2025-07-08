@@ -12,7 +12,7 @@ const EventPayloadSchema = z.object({
   }),
 });
 type Params = { id: string; slug: string };
-export const POST = withWidgetAuth<Params>(async ({ request, context: { params } }, { session, mailbox }) => {
+export const POST = withWidgetAuth<Params>(async ({ request, context: { params } }, { session }) => {
   const { id, slug } = await params;
   let messageId;
   try {
@@ -28,7 +28,6 @@ export const POST = withWidgetAuth<Params>(async ({ request, context: { params }
       conversation: {
         id: conversations.id,
         emailFrom: conversations.emailFrom,
-        mailboxId: conversations.mailboxId,
       },
     })
     .from(conversationMessages)
@@ -37,11 +36,7 @@ export const POST = withWidgetAuth<Params>(async ({ request, context: { params }
     .limit(1)
     .then(takeUniqueOrThrow);
 
-  if (
-    !message ||
-    (message.conversation.emailFrom && message.conversation.emailFrom !== session.email) ||
-    message.conversation.mailboxId !== mailbox.id
-  ) {
+  if (!message || (message.conversation.emailFrom && message.conversation.emailFrom !== session.email)) {
     return Response.json({ error: "Message not found" }, { status: 404 });
   }
 

@@ -12,7 +12,7 @@ export function OPTIONS() {
   return corsOptions("PATCH");
 }
 
-export const PATCH = withWidgetAuth<{ id: string }>(async ({ request, context: { params } }, { session, mailbox }) => {
+export const PATCH = withWidgetAuth<{ id: string }>(async ({ request, context: { params } }, { session }) => {
   const { id } = await params;
   const notificationId = parseInt(id);
 
@@ -24,7 +24,7 @@ export const PATCH = withWidgetAuth<{ id: string }>(async ({ request, context: {
   const { status } = updateNotificationSchema.parse(body);
 
   const platformCustomer = await db.query.platformCustomers.findFirst({
-    where: and(eq(platformCustomers.email, session.email), eq(platformCustomers.mailboxId, mailbox.id)),
+    where: eq(platformCustomers.email, session.email),
   });
 
   if (!platformCustomer) {

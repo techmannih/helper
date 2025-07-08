@@ -31,7 +31,6 @@ export const POST = withWidgetAuth(async ({ request }, { mailbox }) => {
       const newConversation = await createConversation(
         {
           emailFrom: email,
-          mailboxId: mailbox.id,
           subject: "Contact Form Submission",
           status: "open",
           source: "form",

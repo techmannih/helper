@@ -17,7 +17,7 @@ export function OPTIONS() {
   return corsOptions();
 }
 
-export const POST = withWidgetAuth(async ({ request }, { mailbox }) => {
+export const POST = withWidgetAuth(async ({ request }) => {
   try {
     const body = await request.json();
     const { sessionId, events, metadata, isRecording } = body;
@@ -32,10 +32,6 @@ export const POST = withWidgetAuth(async ({ request }, { mailbox }) => {
       }),
     );
 
-    if (guideSession.mailboxId !== mailbox.id) {
-      return corsResponse({ error: "Unauthorized" }, { status: 401 });
-    }
-
     if (isRecording) {
       await Promise.all(
         events.map((event: any) =>
@@ -43,7 +39,6 @@ export const POST = withWidgetAuth(async ({ request }, { mailbox }) => {
             guideSessionId: guideSession.id,
             type: event.type,
             data: event,
-            mailboxId: guideSession.mailboxId,
             timestamp: event.timestamp ? new Date(event.timestamp) : new Date(),
             metadata: metadata || {},
           }),
@@ -65,7 +60,6 @@ export const POST = withWidgetAuth(async ({ request }, { mailbox }) => {
             type: eventData.type,
             data: eventData.data,
             timestamp: eventData.timestamp,
-            mailboxId: guideSession.mailboxId,
           });
         }),
       );
