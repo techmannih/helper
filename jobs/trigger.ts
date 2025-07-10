@@ -40,7 +40,10 @@ const events = {
     data: z.object({
       userId: z.string(),
       conversationFilter: z.union([z.array(z.number()), searchSchema]),
-      status: z.enum(["open", "closed", "spam"]),
+      status: z.enum(["open", "closed", "spam"]).optional(),
+      assignedToId: z.string().optional(),
+      assignedToAI: z.boolean().optional(),
+      message: z.string().optional(),
     }),
     jobs: ["bulkUpdateConversations"],
   },
