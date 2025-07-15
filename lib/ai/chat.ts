@@ -462,8 +462,9 @@ export const createUserMessage = async (
   conversationId: number,
   email: string | null,
   query: string,
-  screenshotData?: string,
+  attachmentData: { name: string; contentType: string; data: string }[],
 ) => {
+  const hasAttachments = attachmentData?.length > 0;
   const message = await createConversationMessage({
     conversationId,
     emailFrom: email,
@@ -473,16 +474,20 @@ export const createUserMessage = async (
     isPerfect: false,
     isPinned: false,
     isFlaggedAsBad: false,
-    metadata: { includesScreenshot: !!screenshotData },
+    metadata: { hasAttachments },
   });
 
-  if (screenshotData) {
-    await createAndUploadFile({
-      data: Buffer.from(screenshotData, "base64"),
-      fileName: `screenshot-${Date.now()}.png`,
-      prefix: `screenshots/${conversationId}`,
-      messageId: message.id,
-    });
+  if (hasAttachments) {
+    await Promise.all(
+      attachmentData.map((attachment) =>
+        createAndUploadFile({
+          data: Buffer.from(attachment.data, "base64"),
+          fileName: attachment.name,
+          prefix: `attachments/${conversationId}`,
+          messageId: message.id,
+        }),
+      ),
+    );
   }
 
   return message;

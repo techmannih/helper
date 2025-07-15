@@ -11,6 +11,7 @@ import {
   generateConversationSubject,
   getConversationBySlugAndMailbox,
 } from "@/lib/data/conversation";
+import { validateAttachments } from "@/lib/shared/attachmentValidation";
 import { createClient } from "@/lib/supabase/server";
 import { WidgetSessionPayload } from "@/lib/widgetSession";
 
@@ -54,23 +55,42 @@ export const POST = withWidgetAuth(async ({ request }, { session, mailbox }) => 
   const conversation = await getConversation(conversationSlug, session);
 
   const userEmail = session.isAnonymous ? null : session.email || null;
-  const screenshotData = message.experimental_attachments?.[0]?.url;
+  const attachments = message.experimental_attachments ?? [];
 
-  if (
-    (message.experimental_attachments ?? []).length > 1 ||
-    (screenshotData && !screenshotData.startsWith("data:image/png;base64,"))
-  ) {
-    return corsResponse(
-      { error: "Only a single PNG image attachment sent via data URL is supported" },
-      { status: 400 },
-    );
+  const validationResult = validateAttachments(
+    attachments.map((att) => ({
+      name: att.name || "unknown",
+      url: att.url,
+      type: att.contentType,
+    })),
+  );
+
+  if (!validationResult.isValid) {
+    return corsResponse({ error: validationResult.errors.join(", ") }, { status: 400 });
   }
+
+  const attachmentData = attachments.map((attachment) => {
+    if (!attachment.url) {
+      throw new Error(`Attachment ${attachment.name || "unknown"} is missing URL`);
+    }
+
+    const [, base64Data] = attachment.url.split(",");
+    if (!base64Data) {
+      throw new Error(`Attachment ${attachment.name || "unknown"} has invalid URL format`);
+    }
+
+    return {
+      name: attachment.name || "unknown.png",
+      contentType: attachment.contentType || "image/png",
+      data: base64Data,
+    };
+  });
 
   const userMessage = await createUserMessage(
     conversation.id,
     userEmail,
-    message.content,
-    screenshotData?.replace("data:image/png;base64,", ""),
+    message.content || (attachmentData.length > 0 ? "[Image]" : ""),
+    attachmentData,
   );
 
   const supabase = await createClient();
