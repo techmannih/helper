@@ -5,7 +5,7 @@ import { ReadPageToolConfig } from "@helperai/sdk";
 import { corsOptions, corsResponse, withWidgetAuth } from "@/app/api/widget/utils";
 import { db } from "@/db/client";
 import { conversations } from "@/db/schema";
-import { createUserMessage, respondWithAI } from "@/lib/ai/chat";
+import { ClientProvidedTool, createUserMessage, respondWithAI } from "@/lib/ai/chat";
 import {
   CHAT_CONVERSATION_SUBJECT,
   generateConversationSubject,
@@ -24,6 +24,7 @@ interface ChatRequestBody {
   readPageTool: ReadPageToolConfig | null;
   guideEnabled: boolean;
   isToolResult?: boolean;
+  tools?: ClientProvidedTool[];
 }
 
 const getConversation = async (conversationSlug: string, session: WidgetSessionPayload) => {
@@ -50,7 +51,7 @@ export function OPTIONS() {
 }
 
 export const POST = withWidgetAuth(async ({ request }, { session, mailbox }) => {
-  const { message, conversationSlug, readPageTool, guideEnabled }: ChatRequestBody = await request.json();
+  const { message, conversationSlug, readPageTool, guideEnabled, tools }: ChatRequestBody = await request.json();
 
   const conversation = await getConversation(conversationSlug, session);
 
@@ -110,6 +111,7 @@ export const POST = withWidgetAuth(async ({ request }, { session, mailbox }) => 
     sendEmail: false,
     reasoningEnabled: false,
     isHelperUser,
+    tools,
     onResponse: ({ messages, isPromptConversation, isFirstMessage, humanSupportRequested }) => {
       if (
         (!isPromptConversation && conversation.subject === CHAT_CONVERSATION_SUBJECT) ||
