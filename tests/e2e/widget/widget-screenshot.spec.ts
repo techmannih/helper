@@ -5,7 +5,7 @@ import { ApiVerifier } from "./page-objects/apiVerifier";
 import { WidgetPage } from "./page-objects/widgetPage";
 
 // Configure tests to run serially to avoid resource contention
-test.describe.configure({ mode: 'serial' });
+test.describe.configure({ mode: "serial" });
 
 test.describe("Helper Chat Widget - Screenshot Functionality", () => {
   let widgetPage: WidgetPage;
@@ -46,7 +46,7 @@ test.describe("Helper Chat Widget - Screenshot Functionality", () => {
 
     // First type a message with screenshot keyword to show the checkbox
     await widgetPage.chatInput.fill("Please take a screenshot");
-    
+
     // Wait for checkbox to appear
     await widgetPage.screenshotCheckbox.waitFor({ state: "visible", timeout: 5000 });
 
@@ -92,16 +92,17 @@ test.describe("Helper Chat Widget - Screenshot Functionality", () => {
     await widgetPage.chatInput.fill(testData.messages.withScreenshot);
     await widgetPage.screenshotCheckbox.check();
     await widgetPage.sendButton.click();
-    
+
     // Wait for the message to be sent (even though screenshot failed)
     await widgetPage.waitForResponse();
-    
+
     // Verify the message was sent without screenshot
     const chatCall = await apiVerifier.verifyChatApiCall();
-    const hasScreenshot = chatCall?.body?.messages?.some(
-      (msg: any) => msg.experimental_attachments?.length > 0 || msg.attachments?.length > 0 || msg.screenshot
-    ) || false;
-    
+    const hasScreenshot =
+      chatCall?.body?.messages?.some(
+        (msg: any) => msg.experimental_attachments?.length > 0 || msg.attachments?.length > 0 || msg.screenshot,
+      ) || false;
+
     expect(hasScreenshot).toBe(false);
 
     const messagesSent = await widgetPage.getMessageCount();
@@ -125,7 +126,6 @@ test.describe("Helper Chat Widget - Screenshot Functionality", () => {
     const labelText = await widgetPage.widgetFrame.locator('label[for="screenshot"]').textContent();
     expect(labelText).toContain("Include a screenshot for better support?");
   });
-
 
   test("should disable input during screenshot capture", async () => {
     await widgetPage.loadWidget(widgetConfigs.authenticated);
@@ -195,7 +195,7 @@ test.describe("Helper Chat Widget - Screenshot Functionality", () => {
 
     // First type a message with screenshot keyword to show the checkbox
     await widgetPage.chatInput.fill("Please take a screenshot");
-    
+
     // Wait for checkbox to appear
     await widgetPage.screenshotCheckbox.waitFor({ state: "visible", timeout: 5000 });
 

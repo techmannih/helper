@@ -1,8 +1,8 @@
+import { isMacOS } from "@tiptap/core";
 import { Camera, Mic, Paperclip, X } from "lucide-react";
 import * as motion from "motion/react-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { isMacOS } from "@tiptap/core";
 import { useSpeechRecognition } from "@/components/hooks/useSpeechRecognition";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
@@ -153,7 +153,7 @@ export default function ChatInput({
       if (screenshot.response) {
         // Screenshot captured successfully
         setScreenshotState({ state: "captured", response: screenshot.response });
-        
+
         const pendingAttachments = pendingAttachmentsRef.current;
         pendingAttachmentsRef.current = [];
 
@@ -491,9 +491,7 @@ export default function ChatInput({
                 {screenshotState.state === "capturing"
                   ? "Capturing screenshot..."
                   : "Include a screenshot for better support?"}
-                {isMacOS() && (
-                  <span className="text-xs opacity-60 ml-1">(⌘⇧S)</span>
-                )}
+                {isMacOS() && <span className="text-xs opacity-60 ml-1">(⌘⇧S)</span>}
               </label>
             </div>
             {screenshotState.state === "error" && (

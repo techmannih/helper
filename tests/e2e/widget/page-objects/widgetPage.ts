@@ -136,7 +136,7 @@ export class WidgetPage {
   async toggleScreenshotWithKeyboard() {
     // First ensure the input is focused
     await this.chatInput.focus();
-    
+
     // Since keyboard shortcuts don't work reliably across iframe boundaries in tests,
     // we'll click the label which is associated with the checkbox
     const label = this.widgetFrame.locator('label[for="screenshot"]');
