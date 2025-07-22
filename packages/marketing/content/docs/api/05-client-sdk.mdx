@@ -28,6 +28,7 @@ import { HelperClient } from "@helper/client";
 const client = new HelperClient({
   host: "https://your-helper-instance.com",
   email: "john@example.com",
+  emailHash: "<generated-hmac-hash>",
   customerMetadata: {
     name: "John Doe",
   },
