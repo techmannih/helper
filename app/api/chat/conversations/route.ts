@@ -1,4 +1,5 @@
 import { and, count, inArray } from "drizzle-orm";
+import { getCustomerFilterForSearch } from "@/app/api/chat/customerFilter";
 import { db } from "@/db/client";
 import { conversationMessages } from "@/db/schema";
 import { customerSearchSchema } from "@/lib/data/conversation/customerSearchSchema";
@@ -11,12 +12,8 @@ const PAGE_SIZE = 20;
 export const GET = withWidgetAuth(async ({ request }, { session, mailbox }) => {
   const url = new URL(request.url);
 
-  let customerFilter;
-  if (session.isAnonymous && session.anonymousSessionId) {
-    customerFilter = { anonymousSessionId: session.anonymousSessionId };
-  } else if (session.email) {
-    customerFilter = { customer: [session.email] };
-  } else {
+  const customerFilter = getCustomerFilterForSearch(session);
+  if (!customerFilter) {
     return Response.json({ error: "Not authorized - Invalid session" }, { status: 401 });
   }
 
