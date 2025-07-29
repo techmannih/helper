@@ -6,8 +6,10 @@ import type {
   ConversationDetails,
   ConversationsResult,
   CreateConversationParams,
+  CreateConversationResult,
   UnreadConversationsCountResult,
   UpdateConversationParams,
+  UpdateConversationResult,
 } from "@helperai/client";
 import { useHelperClient } from "../components/helperClientProvider";
 
@@ -69,7 +71,7 @@ export const useUnreadConversationsCount = (
 };
 
 export const useCreateConversation = (
-  mutationOptions?: Partial<UseMutationOptions<any, Error, CreateConversationParams>>,
+  mutationOptions?: Partial<UseMutationOptions<CreateConversationResult, Error, CreateConversationParams>>,
 ) => {
   const { client, queryClient } = useHelperClient();
 
@@ -84,7 +86,9 @@ export const useCreateConversation = (
 };
 
 export const useUpdateConversation = (
-  mutationOptions?: Partial<UseMutationOptions<any, Error, { slug: string; params: UpdateConversationParams }>>,
+  mutationOptions?: Partial<
+    UseMutationOptions<UpdateConversationResult, Error, { slug: string; params: UpdateConversationParams }>
+  >,
 ) => {
   const { client, queryClient } = useHelperClient();
 
