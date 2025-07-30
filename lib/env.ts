@@ -14,6 +14,10 @@ export const env = createEnv({
   extends: [vercel()],
   shared: {
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+    CI: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((v) => v === "true"),
     DISABLE_STRICT_MODE: z
       .enum(["true", "false"])
       .default("false")
@@ -59,6 +63,9 @@ export const env = createEnv({
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU",
     ),
     NEXT_RUNTIME: z.enum(["nodejs", "edge"]).default("nodejs"),
+
+    // Helper host URL configuration - overrides automatic detection
+    HELPER_HOST: z.string().url().optional().default("https://helperai.dev"),
 
     // Other optional integrations
 
@@ -124,6 +131,7 @@ export const env = createEnv({
    */
   experimental__runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    CI: process.env.CI,
     DISABLE_STRICT_MODE: process.env.DISABLE_STRICT_MODE,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
