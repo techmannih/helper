@@ -15,9 +15,9 @@ export const env = createEnv({
   shared: {
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
     CI: z
-      .enum(["true", "false"])
+      .enum(["true", "false", "1", "0"])
       .default("false")
-      .transform((v) => v === "true"),
+      .transform((v) => v === "true" || v === "1"),
     DISABLE_STRICT_MODE: z
       .enum(["true", "false"])
       .default("false")
