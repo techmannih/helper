@@ -11,6 +11,7 @@ export {
   useUnreadConversationsCount,
   useCreateConversation,
   useUpdateConversation,
+  useCreateMessage,
 } from "./hooks/useConversations";
 export { useCreateSession } from "./hooks/useSession";
 export { useChat, type UseChatProps } from "./hooks/useChat";
