@@ -322,7 +322,7 @@ export const generateAIResponse = async ({
   readPageTool = null,
   onFinish,
   dataStream,
-  model = openai(CHAT_MODEL),
+  model = openai(CHAT_MODEL, { structuredOutputs: false }),
   addReasoning = false,
   reasoningModel = REASONING_MODEL,
   evaluation = false,
