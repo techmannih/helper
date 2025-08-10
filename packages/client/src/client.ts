@@ -286,12 +286,13 @@ export class HelperClient {
         }: {
           messages: any[];
           id: string;
-          requestBody?: object;
+          requestBody?: any;
         }) => ({
           id,
           message: messages[messages.length - 1],
           conversationSlug: conversation.slug,
           tools: serializeTools(tools),
+          customerSpecificTools: requestBody?.customerSpecificTools,
           requestBody,
         }),
         onToolCall: ({ toolCall }: { toolCall: { toolName: string; args: unknown } }) => {

@@ -18,6 +18,7 @@ import { validateAttachments } from "@/lib/shared/attachmentValidation";
 import { createClient } from "@/lib/supabase/server";
 import { WidgetSessionPayload } from "@/lib/widgetSession";
 import { ToolRequestBody } from "@/packages/client/dist";
+import { cacheTools } from "@/lib/data/cachedTools";
 
 export const maxDuration = 60;
 
@@ -29,6 +30,7 @@ interface ChatRequestBody {
   guideEnabled: boolean;
   isToolResult?: boolean;
   tools?: Record<string, ToolRequestBody>;
+  customerSpecificTools?: boolean;
 }
 
 const getConversation = async (conversationSlug: string, session: WidgetSessionPayload) => {
@@ -53,7 +55,14 @@ const getConversation = async (conversationSlug: string, session: WidgetSessionP
 export const OPTIONS = () => corsOptions("POST");
 
 export const POST = withWidgetAuth(async ({ request }, { session, mailbox }) => {
-  const { message, conversationSlug, readPageTool, guideEnabled, tools }: ChatRequestBody = await request.json();
+  const {
+    message,
+    conversationSlug,
+    readPageTool,
+    guideEnabled,
+    tools,
+    customerSpecificTools,
+  }: ChatRequestBody = await request.json();
 
   Sentry.setTag("conversation_slug", conversationSlug);
 
@@ -97,6 +106,10 @@ export const POST = withWidgetAuth(async ({ request }, { session, mailbox }) => 
     message.content || (attachmentData.length > 0 ? "[Image]" : ""),
     attachmentData,
   );
+
+  if (tools) {
+    await cacheTools(mailbox.id, tools, customerSpecificTools ? conversation.emailFrom : null);
+  }
 
   const supabase = await createClient();
   let isHelperUser = false;
