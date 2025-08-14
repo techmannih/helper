@@ -285,7 +285,7 @@ export default function Conversation({
     if (status === "ready" || isNewConversation) {
       inputRef.current?.focus();
     }
-  }, [status, isNewConversation]);
+  }, [status, isNewConversation, selectedConversationSlug]);
 
   useEffect(() => {
     if (isNewConversation) {
