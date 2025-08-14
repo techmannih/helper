@@ -26,6 +26,9 @@ export const GenerateKnowledgeBankDialog = ({ open, onOpenChange, messageId }: G
   const [editedContent, setEditedContent] = useState<string>("");
   const [suggestionReason, setSuggestionReason] = useState<string>("");
   const [hasGenerated, setHasGenerated] = useState(false);
+  const [suggestionAction, setSuggestionAction] = useState<
+    "create_entry" | "update_entry" | "no_action" | null
+  >(null);
   const [updateEntryId, setUpdateEntryId] = useState<number | null>(null);
   const [originalContent, setOriginalContent] = useState<string>("");
 
@@ -38,6 +41,7 @@ export const GenerateKnowledgeBankDialog = ({ open, onOpenChange, messageId }: G
 
   const generateSuggestionMutation = api.mailbox.faqs.suggestFromHumanReply.useMutation({
     onSuccess: (data) => {
+      setSuggestionAction(data.action);
       if (data.action === "create_entry" || data.action === "update_entry") {
         setEditedContent(data.content || "");
         setSuggestionReason(data.reason);
@@ -50,10 +54,12 @@ export const GenerateKnowledgeBankDialog = ({ open, onOpenChange, messageId }: G
           setOriginalContent(existingEntry?.content || "");
         }
       } else {
+        // No knowledge entry is needed; show the reason in the dialog for clarity
         toast.info("No knowledge entry needed", {
           description: data.reason,
         });
-        onOpenChange(false);
+        setSuggestionReason(data.reason);
+        setHasGenerated(true);
       }
     },
     onError: (error) => {
@@ -95,6 +101,7 @@ export const GenerateKnowledgeBankDialog = ({ open, onOpenChange, messageId }: G
     setEditedContent("");
     setSuggestionReason("");
     setHasGenerated(false);
+    setSuggestionAction(null);
     setUpdateEntryId(null);
     setOriginalContent("");
   };
@@ -174,6 +181,13 @@ export const GenerateKnowledgeBankDialog = ({ open, onOpenChange, messageId }: G
                 AI is analyzing your reply to suggest a knowledge bank entry...
               </p>
             </div>
+          ) : suggestionAction === "no_action" ? (
+            <div className="space-y-4">
+              <div>
+                <Label>AI Suggestion</Label>
+                <p className="text-sm text-muted-foreground mt-1 p-3 bg-muted rounded-md">{suggestionReason}</p>
+              </div>
+            </div>
           ) : (
             <div className="space-y-4">
               <div>
@@ -208,9 +222,9 @@ export const GenerateKnowledgeBankDialog = ({ open, onOpenChange, messageId }: G
 
         <DialogFooter>
           <Button variant="outlined" onClick={() => onOpenChange(false)}>
-            Cancel
+            {hasGenerated ? "Close" : "Cancel"}
           </Button>
-          {hasGenerated && (
+          {hasGenerated && suggestionAction !== "no_action" && (
             <Button onClick={handleSave} disabled={isLoading}>
               {(createKnowledgeMutation.isPending || updateKnowledgeMutation.isPending) && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
