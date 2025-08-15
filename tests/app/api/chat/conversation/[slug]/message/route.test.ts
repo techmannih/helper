@@ -61,6 +61,41 @@ describe("POST /api/chat/conversation/[slug]/message", () => {
     );
   });
 
+  it("should forward tools to triggerEvent", async () => {
+    const { mailbox } = await mailboxFactory.create();
+    const { conversation } = await conversationFactory.create({
+      emailFrom: "test@example.com",
+    });
+
+    mockSession = { isAnonymous: false, email: "test@example.com" };
+    mockMailbox = mailbox;
+
+    const tools = {
+      weather: {
+        description: "Fetch weather",
+        parameters: { location: { type: "string" } },
+      },
+    };
+
+    const request = new Request("https://example.com/api", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: "Hello world", tools }),
+    });
+
+    const response = await POST(request, {
+      params: Promise.resolve({ slug: conversation.slug }),
+    });
+    await response.json();
+
+    expect(response.status).toBe(200);
+    expect(triggerEvent).toHaveBeenCalledWith(
+      "conversations/auto-response.create",
+      { messageId: "msg123", tools },
+      { sleepSeconds: 5 * 60 },
+    );
+  });
+
   it("should work with anonymous session", async () => {
     const { mailbox } = await mailboxFactory.create();
     const anonymousSessionId = "anon123";
